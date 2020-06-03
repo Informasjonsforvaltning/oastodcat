@@ -32,6 +32,9 @@ class OASDataService(DataService):
             )
         # Assuming English
         self.title = {"en": specification["info"]["title"]}
+        if "servers" in specification:
+            if "url" in specification["servers"]:
+                self.endpointURL = specification["servers"]["url"]
 
 
 class Error(Exception):
