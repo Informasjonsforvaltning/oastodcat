@@ -25,6 +25,11 @@ class OASDataService(DataService):
         super().__init__()
         if not (specification):
             raise NotValidOASError("Empty specification object")
+
+        if not specification["openapi"].startswith("3.0."):
+            raise NotSupportedOASError(
+                f'Version {specification["openapi"]}" is not supported'
+            )
         # Assuming English
         self.title = {"en": specification["info"]["title"]}
 
@@ -36,6 +41,18 @@ class Error(Exception):
 
 
 class NotValidOASError(Error):
+    """The specification object is not valid.
+
+    Attributes:
+        message -- explanation of the error
+    """
+
+    def __init__(self, message: str) -> None:
+        """Inits an object with default values."""
+        self.message = message
+
+
+class NotSupportedOASError(Error):
     """The specification object is not valid.
 
     Attributes:

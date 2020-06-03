@@ -14,4 +14,5 @@ except PackageNotFoundError:  # pragma: no cover
     __version__ = "unknown"
 
 from .oas_dataservice import NotValidOASError
+from .oas_dataservice import NotSupportedOASError
 from .oas_dataservice import OASDataService

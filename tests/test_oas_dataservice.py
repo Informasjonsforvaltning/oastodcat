@@ -5,7 +5,7 @@ import pytest
 from rdflib import Graph
 from rdflib.compare import graph_diff, isomorphic
 
-from oastodcat import NotValidOASError, OASDataService
+from oastodcat import NotSupportedOASError, NotValidOASError, OASDataService
 
 
 @pytest.fixture(scope="session")  # one server to rule'em all
@@ -29,6 +29,23 @@ def test_read_empty_spec_should_raise_error() -> None:
     with pytest.raises(NotValidOASError):
         specification = "{}"
         oas = json.loads(specification)
+        OASDataService(oas)
+
+
+def test_read_other_than_v3_spec_should_raise_error() -> None:
+    """It raises a NotValidOASError."""
+    with pytest.raises(NotSupportedOASError):
+        v2_spec = """
+            {
+              "openapi": "2.0",
+              "info": {
+                "title": "fdk-reports-bff",
+                "version": "1.0"
+              },
+              "paths": {}
+            }
+        """
+        oas = json.loads(v2_spec)
         OASDataService(oas)
 
 

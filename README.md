@@ -1,3 +1,7 @@
+![Tests](https://github.com/Informasjonsforvaltning/oastodcat/workflows/Tests/badge.svg)
+[![codecov](https://codecov.io/gh/Informasjonsforvaltning/oastodcat/branch/master/graph/badge.svg)](https://codecov.io/gh/Informasjonsforvaltning/oastodcat)
+[![PyPI](https://img.shields.io/pypi/v/oastodcat.svg)](https://pypi.org/project/oastodcat/)
+[![Read the Docs](https://readthedocs.org/projects/oastodcat/badge/)](https://oastodcat.readthedocs.io/)
 # oastodcat
 
 A small Python library to transform an openAPI file to a dcat:DataService
