@@ -1,0 +1,24 @@
+rule infer
+  command = /home/stigbd/src/informasjonsforvaltning/oastodcat/.nox/pytype/bin/python -m pytype.single --imports_info $imports --module-name $module -V 3.7 -o $out --no-report-errors --nofail --quick $in
+  description = infer $module
+rule check
+  command = /home/stigbd/src/informasjonsforvaltning/oastodcat/.nox/pytype/bin/python -m pytype.single --disable import-error --imports_info $imports --module-name $module -V 3.7 -o $out --analyze-annotated --nofail --quick $in
+  description = check $module
+build /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/pyi/noxfile.pyi: check /home/stigbd/src/informasjonsforvaltning/oastodcat/noxfile.py
+  imports = /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/imports/noxfile.imports
+  module = noxfile
+build /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/pyi/oastodcat/oas_dataservice.pyi: check /home/stigbd/src/informasjonsforvaltning/oastodcat/src/oastodcat/oas_dataservice.py
+  imports = /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/imports/oastodcat.oas_dataservice.imports
+  module = oastodcat.oas_dataservice
+build /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/pyi/oastodcat/__init__.pyi: check /home/stigbd/src/informasjonsforvaltning/oastodcat/src/oastodcat/__init__.py | /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/pyi/oastodcat/oas_dataservice.pyi
+  imports = /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/imports/oastodcat.__init__.imports
+  module = oastodcat.__init__
+build /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/pyi/tests/test_oas_dataservice.pyi: check /home/stigbd/src/informasjonsforvaltning/oastodcat/tests/test_oas_dataservice.py | /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/pyi/oastodcat/__init__.pyi
+  imports = /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/imports/tests.test_oas_dataservice.imports
+  module = tests.test_oas_dataservice
+build /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/pyi/tests/__init__.pyi: check /home/stigbd/src/informasjonsforvaltning/oastodcat/tests/__init__.py
+  imports = /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/imports/tests.__init__.imports
+  module = tests.__init__
+build /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/pyi/conf.pyi: check /home/stigbd/src/informasjonsforvaltning/oastodcat/docs/conf.py
+  imports = /home/stigbd/src/informasjonsforvaltning/oastodcat/.pytype/imports/conf.imports
+  module = conf
