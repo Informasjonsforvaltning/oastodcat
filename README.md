@@ -37,6 +37,38 @@ dcat = catalog.to_rdf()
 print(dcat.decode())
 ```
 
+## Mapping
+The following table shows how an openAPI specification is mapped to a dcat:DataService:  
+(Only dcat:DataService properties are shown.)
+
+| dcat:DataService         | openAPI v 3.0.x |
+| ------------------------ | --------------- |
+| endpoint description     |                 |
+| endpoint URL             | servers.url     |
+| serves dataset           | _n/a_           |
+| access rights            |                 |
+| conforms to              |                 |
+| contact point            |                 |
+| creator                  |                 |
+| description              |                 |
+| has policy               |                 |
+| identifier               | _n/a_           |
+| is referenced by         |                 |
+| keyword/tag              |                 |
+| landing page             |                 |
+| license                  |                 |
+| resource language        |                 |
+| relation                 |                 |
+| rights                   |                 |
+| qualified relation       |                 |
+| publisher                |                 |
+| release date             |                 |
+| theme/category           |                 |
+| title                    | info.title      |
+| type/genre               |                 |
+| update/modification date |                 |
+| qualified attribution    |                 |
+
 ## Development
 ### Requirements
 - python3
