@@ -14,6 +14,7 @@ Example:
     >>> bool(dataservice.to_rdf())
     True
 """
+from concepttordf import Contact
 from datacatalogtordf import DataService
 
 
@@ -31,9 +32,22 @@ class OASDataService(DataService):
                 f'Version {specification["openapi"]}" is not supported'
             )
         # Assuming English
+        # title
         self.title = {"en": specification["info"]["title"]}
+        # description
         if "description" in specification["info"]:
             self.description = {"en": specification["info"]["description"]}
+        # contactPoint
+        if "contact" in specification["info"]:
+            contact = Contact()
+            if "name" in specification["info"]["contact"]:
+                contact.name = {"en": specification["info"]["contact"]["name"]}
+            if "email" in specification["info"]["contact"]:
+                contact.email = specification["info"]["contact"]["email"]
+            if "url" in specification["info"]["contact"]:
+                contact.url = specification["info"]["contact"]["url"]
+            self.contactpoint = contact
+        # endpointURL
         if "servers" in specification:
             if "url" in specification["servers"]:
                 self.endpointURL = specification["servers"]["url"]
