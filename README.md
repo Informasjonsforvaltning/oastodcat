@@ -41,33 +41,34 @@ print(dcat.decode())
 The following table shows how an openAPI specification is mapped to a dcat:DataService:  
 (Only dcat:DataService properties are shown.)
 
-| dcat:DataService         | openAPI v 3.0.x |
-| ------------------------ | --------------- |
-| endpoint description     |                 |
-| endpoint URL             | servers.url     |
-| serves dataset           | _n/a_           |
-| access rights            |                 |
-| conforms to              |                 |
-| contact point            |                 |
-| creator                  |                 |
-| description              |                 |
-| has policy               |                 |
-| identifier               | _n/a_           |
-| is referenced by         |                 |
-| keyword/tag              |                 |
-| landing page             |                 |
-| license                  |                 |
-| resource language        |                 |
-| relation                 |                 |
-| rights                   |                 |
-| qualified relation       |                 |
-| publisher                |                 |
-| release date             |                 |
-| theme/category           |                 |
-| title                    | info.title      |
-| type/genre               |                 |
-| update/modification date |                 |
-| qualified attribution    |                 |
+| dcat:DataService         | RDF property      | openAPI v 3.0.x    |
+| ------------------------ | ----------------- | ------------------ |
+| endpoint description     |                   | <url to spec>      |
+| endpoint URL             | dcat:endpointURL  | servers.url        |
+| serves dataset           |                   | _n/a_              |
+| access rights            |                   |                    |
+| conforms to              |                   |                    |
+| contact point            | dcat:contactPoint | info.contact       |
+| creator                  |                   |                    |
+| description              | dct:description   | info.description   |
+| has policy               |                   |                    |
+| identifier               |                   | _n/a_              |
+| is referenced by         |                   |                    |
+| keyword/tag              |                   |                    |
+| landing page             |                   |                    |
+| license                  |                   |                    |
+| resource language        |                   |                    |
+| relation                 |                   |                    |
+| rights                   |                   |                    |
+| qualified relation       |                   |                    |
+| publisher                |                   |                    |
+| release date             |                   |                    |
+| theme/category           |                   |                    |
+| title                    | dct:title         | info.title         |
+| type/genre               |                   |                    |
+| update/modification date |                   |                    |
+| qualified attribution    |                   |                    |
+| _media type_             | dcat:mediaType    | <it's complicated> |
 
 ## Development
 ### Requirements

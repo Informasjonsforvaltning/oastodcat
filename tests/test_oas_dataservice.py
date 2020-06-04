@@ -86,14 +86,6 @@ def test_read_minimal_spec(minimal_spec: str) -> None:
 
 def test_read_spec_with_servers_url(minimal_spec: str) -> None:
     """It returns a valid dataservice with endpoint URL."""
-    # Create a dataservice based on an openAPI-specification:
-    # 1. Get the specification
-    # 2. Convert the specification to a json-object if needed
-    # 3. Parse the json
-    # 4. Instantiate a dataservice object with the parsed json
-    # 5. Set the identifer
-    # 6. Create the dcat-representation
-
     oas = json.loads(minimal_spec)
     oas["servers"] = {}
     oas["servers"]["url"] = "http://example.com/server/url"
@@ -109,6 +101,35 @@ def test_read_spec_with_servers_url(minimal_spec: str) -> None:
         <http://example.com/dataservices/1> a dcat:DataService ;
             dct:title   "fdk-reports-bff"@en ;
             dcat:endpointURL   <http://example.com/server/url>
+        .
+        """
+
+    g1 = Graph().parse(data=dataservice.to_rdf(), format="turtle")
+    g2 = Graph().parse(data=src, format="turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic
+
+
+def test_read_spec_with_description(minimal_spec: str) -> None:
+    """It returns a valid dataservice with description."""
+    oas = json.loads(minimal_spec)
+    oas["info"]["description"] = "A description of the fdk-reports-bff"
+    dataservice = OASDataService(oas)
+    dataservice.identifier = "http://example.com/dataservices/1"
+
+    src = """
+        @prefix dct: <http://purl.org/dc/terms/> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix dcat: <http://www.w3.org/ns/dcat#> .
+
+        <http://example.com/dataservices/1> a dcat:DataService ;
+            dct:title   "fdk-reports-bff"@en ;
+            dct:description "A description of the fdk-reports-bff"@en ;
         .
         """
 
