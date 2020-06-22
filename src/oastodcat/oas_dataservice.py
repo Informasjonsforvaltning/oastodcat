@@ -21,6 +21,11 @@ from datacatalogtordf import DataService
 class OASDataService(DataService):
     """A simple class representing an openAPI specification."""
 
+    __slots__ = "specification"
+
+    # Types:
+    specification: dict
+
     def __init__(self, specification: dict) -> None:
         """Inits an object with default values."""
         super().__init__()
@@ -31,6 +36,7 @@ class OASDataService(DataService):
             raise NotSupportedOASError(
                 f'Version {specification["openapi"]}" is not supported'
             )
+        self.specification = specification
         # Assuming English
         # title
         self.title = {"en": specification["info"]["title"]}
@@ -51,6 +57,13 @@ class OASDataService(DataService):
         if "servers" in specification:
             if "url" in specification["servers"]:
                 self.endpointURL = specification["servers"]["url"]
+        # license
+        self._parse_license()
+
+    def _parse_license(self) -> None:
+        if "license" in self.specification["info"]:
+            if "url" in self.specification["info"]["license"]:
+                self.license = self.specification["info"]["license"]["url"]
 
 
 class Error(Exception):

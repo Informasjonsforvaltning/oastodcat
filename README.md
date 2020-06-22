@@ -56,7 +56,7 @@ The following table shows how an openAPI specification is mapped to a dcat:DataS
 | is referenced by         |                   |                    |
 | keyword/tag              |                   |                    |
 | landing page             |                   |                    |
-| license                  |                   |                    |
+| license                  | dct:license       | info.license.url   |
 | resource language        |                   |                    |
 | relation                 |                   |                    |
 | rights                   |                   |                    |
