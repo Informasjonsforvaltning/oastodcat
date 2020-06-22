@@ -24,7 +24,7 @@ def minimal_spec() -> str:
     return minimal_spec
 
 
-def test_read_empty_spec_should_raise_error() -> None:
+def test_parse_empty_spec_should_raise_error() -> None:
     """It raises a NotValidOASError."""
     with pytest.raises(NotValidOASError):
         specification = "{}"
@@ -32,7 +32,7 @@ def test_read_empty_spec_should_raise_error() -> None:
         OASDataService(oas)
 
 
-def test_read_other_than_v3_spec_should_raise_error() -> None:
+def test_parse_other_than_v3_spec_should_raise_error() -> None:
     """It raises a NotValidOASError."""
     with pytest.raises(NotSupportedOASError):
         v2_spec = """
@@ -49,7 +49,7 @@ def test_read_other_than_v3_spec_should_raise_error() -> None:
         OASDataService(oas)
 
 
-def test_read_minimal_spec(minimal_spec: str) -> None:
+def test_parse_minimal_spec(minimal_spec: str) -> None:
     """It returns a valid dataservice."""
     # Create a dataservice based on an openAPI-specification:
     # 1. Get the specification
@@ -84,7 +84,7 @@ def test_read_minimal_spec(minimal_spec: str) -> None:
     assert _isomorphic
 
 
-def test_read_spec_with_servers_url(minimal_spec: str) -> None:
+def test_parse_spec_with_servers_url(minimal_spec: str) -> None:
     """It returns a valid dataservice with endpoint URL."""
     oas = json.loads(minimal_spec)
     oas["servers"] = {}
@@ -114,7 +114,7 @@ def test_read_spec_with_servers_url(minimal_spec: str) -> None:
     assert _isomorphic
 
 
-def test_read_spec_with_description(minimal_spec: str) -> None:
+def test_parse_spec_with_description(minimal_spec: str) -> None:
     """It returns a valid dataservice with description."""
     oas = json.loads(minimal_spec)
     oas["info"]["description"] = "A description of the fdk-reports-bff"
@@ -143,7 +143,7 @@ def test_read_spec_with_description(minimal_spec: str) -> None:
     assert _isomorphic
 
 
-def test_read_spec_with_contact(minimal_spec: str) -> None:
+def test_parse_spec_with_contact(minimal_spec: str) -> None:
     """It returns a valid dataservice with contactPoint."""
     oas = json.loads(minimal_spec)
     oas["info"]["contact"] = {}
@@ -182,7 +182,7 @@ def test_read_spec_with_contact(minimal_spec: str) -> None:
     assert _isomorphic
 
 
-def test_read_spec_with_license(minimal_spec: str) -> None:
+def test_parse_spec_with_license(minimal_spec: str) -> None:
     """It returns a valid dataservice with license."""
     oas = json.loads(minimal_spec)
     oas["info"]["license"] = {}
