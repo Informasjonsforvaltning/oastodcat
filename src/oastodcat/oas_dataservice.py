@@ -14,6 +14,9 @@ Example:
     >>> bool(dataservice.to_rdf())
     True
 """
+import logging
+from typing import List
+
 from concepttordf import Contact
 from datacatalogtordf import DataService
 
@@ -37,6 +40,7 @@ class OASDataService(DataService):
                 f'Version {specification["openapi"]}" is not supported'
             )
         self.specification = specification
+        logging.debug(specification)
         # Assuming English
         # title
         self.title = {"en": specification["info"]["title"]}
@@ -59,11 +63,40 @@ class OASDataService(DataService):
                 self.endpointURL = specification["servers"]["url"]
         # license
         self._parse_license()
+        # mediaType
+        self._parse_media_type()
 
     def _parse_license(self) -> None:
+        """Parses the license object."""
         if "license" in self.specification["info"]:
             if "url" in self.specification["info"]["license"]:
                 self.license = self.specification["info"]["license"]["url"]
+
+    def _parse_media_type(self) -> None:
+        """Parses the media type objects."""
+        self._media_types: List[str] = list()
+        self._seek_media_types(self.specification, ["content"])
+        # Need to remove duplicates:
+        self.media_types = list(set(self._media_types))
+
+    def _seek_media_types(self, d: dict, key_list: List[str]) -> None:
+        """Helper method.
+
+        Seeks for keys matching any of keys in key_list.
+        Adds matching keys to self._media_types.
+
+        Args:
+            d (dict): the dict in which to searc
+            key_list (List[str]): list of keys to search for
+        """
+        _url = "https://www.iana.org/assignments/media-types/"
+        for k, v in d.items():
+            if k in key_list:
+                for key in v.keys():
+                    logging.debug(k + ": " + str(key))
+                    self._media_types.append(_url + str(key))
+            if isinstance(v, dict):
+                self._seek_media_types(v, key_list)
 
 
 class Error(Exception):

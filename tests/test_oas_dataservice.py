@@ -1,9 +1,8 @@
 """Test cases for the oas_dataservice module."""
-import json
-
 import pytest
 from rdflib import Graph
 from rdflib.compare import graph_diff, isomorphic
+import yaml
 
 from oastodcat import NotSupportedOASError, NotValidOASError, OASDataService
 
@@ -11,24 +10,84 @@ from oastodcat import NotSupportedOASError, NotValidOASError, OASDataService
 @pytest.fixture(scope="session")  # one server to rule'em all
 def minimal_spec() -> str:
     """Helper for creating a minimal specification object."""
-    minimal_spec = """
-        {
-          "openapi": "3.0.3",
-          "info": {
-            "title": "fdk-reports-bff",
-            "version": "1.0"
-          },
-          "paths": {}
-        }
-    """
-    return minimal_spec
+    _minimal_spec = """
+                    openapi: 3.0.3
+                    info:
+                      title: Swagger Petstore
+                      version: 1.0.0
+                    paths: {}
+                    """
+    return _minimal_spec
+
+
+@pytest.fixture(scope="session")  # one server to rule'em all
+def spec() -> str:
+    """Helper for creating a specification object with a path item."""
+    _spec = """
+            openapi: "3.0.3"
+            info:
+              version: 1.0.0
+              title: Swagger Petstore
+              license:
+                name: MIT
+            servers:
+              - url: http://petstore.swagger.io/v1
+            paths:
+              /pets:
+                get:
+                  summary: List all pets
+                  responses:
+                    '200':
+                      description: A paged array of pets
+                      content:
+                        application/xml:
+                          schema:
+                            $ref: "#/components/schemas/Pets"
+                        application/json:
+                          schema:
+                            $ref: "#/components/schemas/Pets"
+              /pets/{petId}:
+                get:
+                  parameters:
+                    - name: petId
+                      in: path
+                      required: true
+                      description: The id of the pet to retrieve
+                      schema:
+                        type: string
+                  responses:
+                    '200':
+                      description: Expected response to a valid request
+                      content:
+                        application/json:
+                          schema:
+                            $ref: "#/components/schemas/Pet"
+            components:
+              schemas:
+                Pet:
+                  type: object
+                  required:
+                    - id
+                    - name
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                    name:
+                      type: string
+                Pets:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Pet"
+            """
+    return _spec
 
 
 def test_parse_empty_spec_should_raise_error() -> None:
     """It raises a NotValidOASError."""
     with pytest.raises(NotValidOASError):
         specification = "{}"
-        oas = json.loads(specification)
+        oas = yaml.safe_load(specification)
         OASDataService(oas)
 
 
@@ -36,16 +95,13 @@ def test_parse_other_than_v3_spec_should_raise_error() -> None:
     """It raises a NotValidOASError."""
     with pytest.raises(NotSupportedOASError):
         v2_spec = """
-            {
-              "openapi": "2.0",
-              "info": {
-                "title": "fdk-reports-bff",
-                "version": "1.0"
-              },
-              "paths": {}
-            }
-        """
-        oas = json.loads(v2_spec)
+                    openapi: '2.0'
+                    info:
+                      title: Swagger Petstore
+                      version: 1.0.0
+                    paths: {}
+                    """
+        oas = yaml.safe_load(v2_spec)
         OASDataService(oas)
 
 
@@ -59,7 +115,7 @@ def test_parse_minimal_spec(minimal_spec: str) -> None:
     # 5. Set the identifer
     # 6. Create the dcat-representation
 
-    oas = json.loads(minimal_spec)
+    oas = yaml.safe_load(minimal_spec)
     dataservice = OASDataService(oas)
     dataservice.identifier = "http://example.com/dataservices/1"
 
@@ -70,7 +126,7 @@ def test_parse_minimal_spec(minimal_spec: str) -> None:
         @prefix dcat: <http://www.w3.org/ns/dcat#> .
 
         <http://example.com/dataservices/1> a dcat:DataService ;
-            dct:title   "fdk-reports-bff"@en ;
+            dct:title   "Swagger Petstore"@en ;
         .
         """
 
@@ -86,7 +142,7 @@ def test_parse_minimal_spec(minimal_spec: str) -> None:
 
 def test_parse_spec_with_servers_url(minimal_spec: str) -> None:
     """It returns a valid dataservice with endpoint URL."""
-    oas = json.loads(minimal_spec)
+    oas = yaml.safe_load(minimal_spec)
     oas["servers"] = {}
     oas["servers"]["url"] = "http://example.com/server/url"
     dataservice = OASDataService(oas)
@@ -99,7 +155,7 @@ def test_parse_spec_with_servers_url(minimal_spec: str) -> None:
         @prefix dcat: <http://www.w3.org/ns/dcat#> .
 
         <http://example.com/dataservices/1> a dcat:DataService ;
-            dct:title   "fdk-reports-bff"@en ;
+            dct:title   "Swagger Petstore"@en ;
             dcat:endpointURL   <http://example.com/server/url>
         .
         """
@@ -116,8 +172,8 @@ def test_parse_spec_with_servers_url(minimal_spec: str) -> None:
 
 def test_parse_spec_with_description(minimal_spec: str) -> None:
     """It returns a valid dataservice with description."""
-    oas = json.loads(minimal_spec)
-    oas["info"]["description"] = "A description of the fdk-reports-bff"
+    oas = yaml.safe_load(minimal_spec)
+    oas["info"]["description"] = "A description of the Swagger Petstore"
     dataservice = OASDataService(oas)
     dataservice.identifier = "http://example.com/dataservices/1"
 
@@ -128,8 +184,8 @@ def test_parse_spec_with_description(minimal_spec: str) -> None:
         @prefix dcat: <http://www.w3.org/ns/dcat#> .
 
         <http://example.com/dataservices/1> a dcat:DataService ;
-            dct:title   "fdk-reports-bff"@en ;
-            dct:description "A description of the fdk-reports-bff"@en ;
+            dct:title   "Swagger Petstore"@en ;
+            dct:description "A description of the Swagger Petstore"@en ;
         .
         """
 
@@ -145,7 +201,7 @@ def test_parse_spec_with_description(minimal_spec: str) -> None:
 
 def test_parse_spec_with_contact(minimal_spec: str) -> None:
     """It returns a valid dataservice with contactPoint."""
-    oas = json.loads(minimal_spec)
+    oas = yaml.safe_load(minimal_spec)
     oas["info"]["contact"] = {}
     oas["info"]["contact"]["name"] = "Example Inc"
     oas["info"]["contact"]["email"] = "email@example.com"
@@ -162,7 +218,7 @@ def test_parse_spec_with_contact(minimal_spec: str) -> None:
 
 
         <http://example.com/dataservices/1> a dcat:DataService ;
-            dct:title   "fdk-reports-bff"@en ;
+            dct:title   "Swagger Petstore"@en ;
             dcat:contactPoint [ a               vcard:Organization ;
                                 vcard:hasEmail  <mailto:email@example.com> ;
                                 vcard:hasOrganizationName
@@ -184,7 +240,7 @@ def test_parse_spec_with_contact(minimal_spec: str) -> None:
 
 def test_parse_spec_with_license(minimal_spec: str) -> None:
     """It returns a valid dataservice with license."""
-    oas = json.loads(minimal_spec)
+    oas = yaml.safe_load(minimal_spec)
     oas["info"]["license"] = {}
     oas["info"]["license"]["name"] = "Apache 2.0"
     oas["info"]["license"]["url"] = "https://www.apache.org/licenses/LICENSE-2.0.html"
@@ -198,7 +254,7 @@ def test_parse_spec_with_license(minimal_spec: str) -> None:
         @prefix dcat: <http://www.w3.org/ns/dcat#> .
 
         <http://example.com/dataservices/1> a dcat:DataService ;
-            dct:title   "fdk-reports-bff"@en ;
+            dct:title   "Swagger Petstore"@en ;
             dct:license <https://www.apache.org/licenses/LICENSE-2.0.html> ;
         .
         """
@@ -213,12 +269,44 @@ def test_parse_spec_with_license(minimal_spec: str) -> None:
     assert _isomorphic
 
 
+def test_parse_spec_with_media_types(spec: str) -> None:
+    """It returns a valid dataservice with media types."""
+    oas = yaml.safe_load(spec)
+    dataservice = OASDataService(oas)
+    dataservice.identifier = "http://example.com/dataservices/1"
+
+    src = """
+        @prefix dct: <http://purl.org/dc/terms/> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix dcat: <http://www.w3.org/ns/dcat#> .
+
+        <http://example.com/dataservices/1> a dcat:DataService ;
+            dct:title   "Swagger Petstore"@en ;
+            dcat:mediaType \
+            <https://www.iana.org/assignments/media-types/application/json> ,
+            <https://www.iana.org/assignments/media-types/application/xml> ;
+        .
+        """
+
+    g1 = Graph().parse(data=dataservice.to_rdf(), format="turtle")
+    g2 = Graph().parse(data=src, format="turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+
+    _dump_turtle(g1)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic
+
+
 def test_service_to_rdf_without_identifier_should_raise_error(
     minimal_spec: str,
 ) -> None:
     """It raises a RequiredFieldMissingError."""
     with pytest.raises(AttributeError):
-        oas = json.loads(minimal_spec)
+        oas = yaml.safe_load(minimal_spec)
         dataservice = OASDataService(oas)
         dataservice.to_rdf()
 
