@@ -21,17 +21,28 @@ def minimal_spec() -> str:
 
 
 @pytest.fixture(scope="session")  # one server to rule'em all
-def spec() -> str:
+def spec_with_servers() -> str:
+    """Helper for creating a minimal specification object."""
+    _spec = """
+            openapi: 3.0.3
+            info:
+              title: Swagger Petstore
+              version: 1.0.0
+            servers:
+              - url: http://petstore.swagger.io/v1
+            paths: {}
+            """
+    return _spec
+
+
+@pytest.fixture(scope="session")  # one server to rule'em all
+def spec_with_media_types() -> str:
     """Helper for creating a specification object with a path item."""
     _spec = """
             openapi: "3.0.3"
             info:
-              version: 1.0.0
               title: Swagger Petstore
-              license:
-                name: MIT
-            servers:
-              - url: http://petstore.swagger.io/v1
+              version: 1.0.0
             paths:
               /pets:
                 get:
@@ -140,11 +151,9 @@ def test_parse_minimal_spec(minimal_spec: str) -> None:
     assert _isomorphic
 
 
-def test_parse_spec_with_servers_url(minimal_spec: str) -> None:
+def test_parse_spec_with_servers_url(spec_with_servers: str) -> None:
     """It returns a valid dataservice with endpoint URL."""
-    oas = yaml.safe_load(minimal_spec)
-    oas["servers"] = {}
-    oas["servers"]["url"] = "http://example.com/server/url"
+    oas = yaml.safe_load(spec_with_servers)
     dataservice = OASDataService(oas)
     dataservice.identifier = "http://example.com/dataservices/1"
 
@@ -156,7 +165,7 @@ def test_parse_spec_with_servers_url(minimal_spec: str) -> None:
 
         <http://example.com/dataservices/1> a dcat:DataService ;
             dct:title   "Swagger Petstore"@en ;
-            dcat:endpointURL   <http://example.com/server/url>
+            dcat:endpointURL   <http://petstore.swagger.io/v1>
         .
         """
 
@@ -269,9 +278,9 @@ def test_parse_spec_with_license(minimal_spec: str) -> None:
     assert _isomorphic
 
 
-def test_parse_spec_with_media_types(spec: str) -> None:
+def test_parse_spec_with_media_types(spec_with_media_types: str) -> None:
     """It returns a valid dataservice with media types."""
-    oas = yaml.safe_load(spec)
+    oas = yaml.safe_load(spec_with_media_types)
     dataservice = OASDataService(oas)
     dataservice.identifier = "http://example.com/dataservices/1"
 

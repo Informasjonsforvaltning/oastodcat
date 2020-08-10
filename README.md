@@ -15,6 +15,8 @@ At this moment we support all 3.0.x versions of (The OpenAPI specification)[http
 ```
 ### Getting started
 ```
+import yaml
+import requests
 from datacatalogtordf import Catalog
 from oastodcat import OASDataService
 
@@ -25,14 +27,17 @@ catalog.title = {"en": "A dataset catalog"}
 catalog.publisher = "https://example.com/publishers/1"
 
 # Create a dataservice based on an openAPI-specification:
-oas = json.load(<url_to_specification>)
+url = ("https://raw.githubusercontent.com/"
+      "OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
+      )
+oas = yaml.safe_load(requests.get(url).text)
 dataservice = OASDataService(oas)
 dataservice.identifier = "http://example.com/dataservices/1"
 #
 # Add dataservice to catalog:
 catalog.services.append(dataservice)
 
-# get dcat representation in turtle (default)
+# Get dcat representation in turtle (default)
 dcat = catalog.to_rdf()
 print(dcat.decode())
 ```

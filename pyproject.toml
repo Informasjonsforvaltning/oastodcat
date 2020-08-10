@@ -16,11 +16,13 @@ classifiers=[
 [tool.poetry.dependencies]
 python = "^3.7"
 rdflib = "^5.0.0"
+requests = "^2.24.0"
+pyyaml = "^5.3.1"
+rdflib-jsonld = "^0.5.0"
 importlib_metadata = {version = "^1.5.0", python = "<3.8"}
 datacatalogtordf = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
-rdflib-jsonld = "^0.5.0"
 pytest = "^5.4.1"
 coverage = {extras = ["toml"], version = "^5.0.3"}
 pytest-cov = "^2.8.1"
@@ -41,7 +43,6 @@ xdoctest = {extras = ["all"], version = "^0.11.0"}
 sphinx = "^2.4.4"
 sphinx-autodoc-typehints = "^1.10.3"
 codecov = "^2.0.16"
-pyyaml = "^5.3.1"
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]

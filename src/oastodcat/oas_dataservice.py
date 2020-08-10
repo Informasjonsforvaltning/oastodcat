@@ -5,13 +5,32 @@ dcat:DataService according to the
 `dcat-ap-no v.2 standard <https://doc.difi.no/review/dcat-ap-no/#klasse-dataset>`__
 
 Example:
+    >>> import yaml
+    >>> import requests
+    >>> from datacatalogtordf import Catalog
     >>> from oastodcat import OASDataService
     >>>
-    >>> oas = json.loads(minimal_spec)
+    >>> # Create catalog object
+    >>> catalog = Catalog()
+    >>> catalog.identifier = "http://example.com/catalogs/1"
+    >>> catalog.title = {"en": "A dataset catalog"}
+    >>> catalog.publisher = "https://example.com/publishers/1"
+    >>>
+    >>> # Create a dataservice based on an openAPI-specification:
+    >>> url = ("https://raw.githubusercontent.com/"
+    >>>        "OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
+    >>>       )
+    >>> oas = yaml.safe_load(requests.get(url).text)
     >>> dataservice = OASDataService(oas)
     >>> dataservice.identifier = "http://example.com/dataservices/1"
+    >>> #
+    >>> # Add dataservice to catalog:
+    >>> catalog.services.append(dataservice)
     >>>
-    >>> bool(dataservice.to_rdf())
+    >>> # get dcat representation in turtle (default)
+    >>> dcat = catalog.to_rdf()
+    >>> print(dcat.decode())
+    >>> bool(dcat)
     True
 """
 import logging
@@ -59,8 +78,8 @@ class OASDataService(DataService):
             self.contactpoint = contact
         # endpointURL
         if "servers" in specification:
-            if "url" in specification["servers"]:
-                self.endpointURL = specification["servers"]["url"]
+            if "url" in specification["servers"][0]:
+                self.endpointURL = specification["servers"][0]["url"]
         # license
         self._parse_license()
         # mediaType
