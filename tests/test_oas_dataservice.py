@@ -151,6 +151,43 @@ def test_parse_minimal_spec(minimal_spec: str) -> None:
     assert _isomorphic
 
 
+def test_minimal_spec_and_endpointDescription(minimal_spec: str) -> None:
+    """It returns a valid dataservice with endpointDescription."""
+    # Create a dataservice based on an openAPI-specification:
+    # 1. Get the specification
+    # 2. Convert the specification to a json-object if needed
+    # 3. Parse the json
+    # 4. Instantiate a dataservice object with the parsed json
+    # 5. Set the identifer
+    # 6. Create the dcat-representation
+
+    oas = yaml.safe_load(minimal_spec)
+    dataservice = OASDataService(oas)
+    dataservice.identifier = "http://example.com/dataservices/1"
+    dataservice.endpointDescription = "http://example.com/endpointdescriptions/1"
+
+    src = """
+        @prefix dct: <http://purl.org/dc/terms/> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix dcat: <http://www.w3.org/ns/dcat#> .
+
+        <http://example.com/dataservices/1> a dcat:DataService ;
+            dct:title   "Swagger Petstore"@en ;
+            dcat:endpointDescription   <http://example.com/endpointdescriptions/1>
+        .
+        """
+
+    g1 = Graph().parse(data=dataservice.to_rdf(), format="turtle")
+    g2 = Graph().parse(data=src, format="turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic
+
+
 def test_parse_spec_with_servers_url(spec_with_servers: str) -> None:
     """It returns a valid dataservice with endpoint URL."""
     oas = yaml.safe_load(spec_with_servers)

@@ -33,6 +33,7 @@ url = ("https://raw.githubusercontent.com/"
 oas = yaml.safe_load(requests.get(url).text)
 dataservice = OASDataService(oas)
 dataservice.identifier = "http://example.com/dataservices/1"
+dataservice.endpointDescription = url
 #
 # Add dataservice to catalog:
 catalog.services.append(dataservice)
@@ -46,34 +47,34 @@ print(dcat.decode())
 The following table shows how an openAPI specification is mapped to a dcat:DataService:  
 (Only dcat:DataService properties are shown.)
 
-| dcat:DataService         | RDF property      | openAPI v 3.0.x    |
-| ------------------------ | ----------------- | ------------------ |
-| endpoint description     |                   | <url to spec>      |
-| endpoint URL             | dcat:endpointURL  | servers.url        |
-| serves dataset           |                   | _n/a_              |
-| access rights            |                   |                    |
-| conforms to              |                   |                    |
-| contact point            | dcat:contactPoint | info.contact       |
-| creator                  |                   |                    |
-| description              | dct:description   | info.description   |
-| has policy               |                   |                    |
-| identifier               |                   | _n/a_              |
-| is referenced by         |                   |                    |
-| keyword/tag              |                   |                    |
-| landing page             |                   |                    |
-| license                  | dct:license       | info.license.url   |
-| resource language        |                   |                    |
-| relation                 |                   |                    |
-| rights                   |                   |                    |
-| qualified relation       |                   |                    |
-| publisher                |                   |                    |
-| release date             |                   |                    |
-| theme/category           |                   |                    |
-| title                    | dct:title         | info.title         |
-| type/genre               |                   |                    |
-| update/modification date |                   |                    |
-| qualified attribution    |                   |                    |
-| _media type_             | dcat:mediaType    | <it's complicated> |
+| dcat:DataService         | RDF property             | openAPI v 3.0.x      |
+| ------------------------ | ------------------------ | -------------------- |
+| endpoint description     | dcat:endpointDescription | <url to description> |
+| endpoint URL             | dcat:endpointURL         | servers.url          |
+| serves dataset           |                          | _n/a_                |
+| access rights            |                          |                      |
+| conforms to              |                          |                      |
+| contact point            | dcat:contactPoint        | info.contact         |
+| creator                  |                          |                      |
+| description              | dct:description          | info.description     |
+| has policy               |                          |                      |
+| identifier               |                          | _n/a_                |
+| is referenced by         |                          |                      |
+| keyword/tag              |                          |                      |
+| landing page             |                          |                      |
+| license                  | dct:license              | info.license.url     |
+| resource language        |                          |                      |
+| relation                 |                          |                      |
+| rights                   |                          |                      |
+| qualified relation       |                          |                      |
+| publisher                |                          |                      |
+| release date             |                          |                      |
+| theme/category           |                          |                      |
+| title                    | dct:title                | info.title           |
+| type/genre               |                          |                      |
+| update/modification date |                          |                      |
+| qualified attribution    |                          |                      |
+| _media type_             | dcat:mediaType           | <it's complicated>   |
 
 ## Development
 ### Requirements

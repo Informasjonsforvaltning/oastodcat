@@ -23,6 +23,7 @@ Example:
     >>> oas = yaml.safe_load(requests.get(url).text)
     >>> dataservice = OASDataService(oas)
     >>> dataservice.identifier = "http://example.com/dataservices/1"
+    >>> dataservice.endpointDescription = url
     >>> #
     >>> # Add dataservice to catalog:
     >>> catalog.services.append(dataservice)
