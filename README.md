@@ -61,7 +61,7 @@ The following table shows how an openAPI specification is mapped to a dcat:DataS
 | identifier               |                          | _n/a_                |
 | is referenced by         |                          |                      |
 | keyword/tag              |                          |                      |
-| landing page             |                          |                      |
+| landing page             | dcat:landingPage         | externalDocs         |
 | license                  | dct:license              | info.license.url     |
 | resource language        |                          |                      |
 | relation                 |                          |                      |

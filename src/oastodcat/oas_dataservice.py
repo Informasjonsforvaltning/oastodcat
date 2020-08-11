@@ -85,6 +85,8 @@ class OASDataService(DataService):
         self._parse_license()
         # mediaType
         self._parse_media_type()
+        # externalDocs
+        self._parse_external_docs()
 
     def _parse_license(self) -> None:
         """Parses the license object."""
@@ -117,6 +119,12 @@ class OASDataService(DataService):
                     self._media_types.append(_url + str(key))
             if isinstance(v, dict):
                 self._seek_media_types(v, key_list)
+
+    def _parse_external_docs(self) -> None:
+        """Parses the externalDocs objects."""
+        if "externalDocs" in self.specification:
+            if "url" in self.specification["externalDocs"]:
+                self.landing_page.append(self.specification["externalDocs"]["url"])
 
 
 class Error(Exception):

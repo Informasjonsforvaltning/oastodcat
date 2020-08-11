@@ -94,6 +94,22 @@ def spec_with_media_types() -> str:
     return _spec
 
 
+@pytest.fixture(scope="session")  # one server to rule'em all
+def spec_with_external_docs() -> str:
+    """Helper for creating a specification object with externalDocs."""
+    _spec = """
+            openapi: 3.0.3
+            info:
+              title: Swagger Petstore
+              version: 1.0.0
+            paths: {}
+            externalDocs:
+              description: Find more info here
+              url: https://example.com
+            """
+    return _spec
+
+
 def test_parse_empty_spec_should_raise_error() -> None:
     """It raises a NotValidOASError."""
     with pytest.raises(NotValidOASError):
@@ -355,6 +371,34 @@ def test_service_to_rdf_without_identifier_should_raise_error(
         oas = yaml.safe_load(minimal_spec)
         dataservice = OASDataService(oas)
         dataservice.to_rdf()
+
+
+def test_parse_spec_with_external_docs(spec_with_external_docs: str) -> None:
+    """It returns a valid dataservice with dcat:landingPage."""
+    oas = yaml.safe_load(spec_with_external_docs)
+    dataservice = OASDataService(oas)
+    dataservice.identifier = "http://example.com/dataservices/1"
+
+    src = """
+        @prefix dct: <http://purl.org/dc/terms/> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix dcat: <http://www.w3.org/ns/dcat#> .
+
+        <http://example.com/dataservices/1> a dcat:DataService ;
+            dct:title   "Swagger Petstore"@en ;
+            dcat:landingPage   <https://example.com>
+        .
+        """
+
+    g1 = Graph().parse(data=dataservice.to_rdf(), format="turtle")
+    g2 = Graph().parse(data=src, format="turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic
 
 
 # ---------------------------------------------------------------------- #
