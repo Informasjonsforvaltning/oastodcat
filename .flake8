@@ -1,5 +1,5 @@
 [flake8]
-select = ANN,B,B9,BLK,C,D,DAR,E,F,I,S,W
+select = ANN,B,B9,BLK,C,D,DAR,E,F,I,N,S,W
 docstring-convention = google
 max-complexity = 10
 ignore = ANN101,B009,E203,E501,W503

@@ -21,12 +21,13 @@ Example:
     >>>        "OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
     >>>       )
     >>> oas = yaml.safe_load(requests.get(url).text)
-    >>> dataservice = OASDataService(oas)
-    >>> dataservice.identifier = "http://example.com/dataservices/1"
-    >>> dataservice.endpointDescription = url
+    >>> dataservices = OASDataService(oas)
+    >>> dataservices.identifier = "http://example.com/dataservices/{uuid}"
+    >>> dataservices.endpointDescription = url
     >>> #
-    >>> # Add dataservice to catalog:
-    >>> catalog.services.append(dataservice)
+    >>> # Add dataservices to catalog:
+    >>> for dataservice in dataservices:
+    >>>     catalog.services.append(dataservice)
     >>>
     >>> # get dcat representation in turtle (default)
     >>> dcat = catalog.to_rdf()
@@ -34,23 +35,34 @@ Example:
     >>> bool(dcat)
     True
 """
-import logging
-from typing import List
+from typing import List, Optional
+import uuid
 
 from concepttordf import Contact
-from datacatalogtordf import DataService
+from datacatalogtordf import DataService, URI
 
 
-class OASDataService(DataService):
+class OASDataService:
     """A simple class representing an openAPI specification."""
 
-    __slots__ = "specification"
+    __slots__ = (
+        "specification",
+        "dataservices",
+        "_identifier",
+        "endpointdescription",
+        "_media_types",
+        "_dataservice",
+    )
 
     # Types:
     specification: dict
+    dataservices: List[DataService]
+    _identifier: str
+    endpointdescription: URI
+    _media_types: List[str]
 
-    def __init__(self, specification: dict) -> None:
-        """Inits an object with default values."""
+    def __init__(self, url: str, specification: dict, identifier: str) -> None:
+        """Inits an object with default values and parses the specification."""
         super().__init__()
         if not (specification):
             raise NotValidOASError("Empty specification object")
@@ -59,28 +71,55 @@ class OASDataService(DataService):
             raise NotSupportedOASError(
                 f'Version {specification["openapi"]}" is not supported'
             )
+        if len(identifier) == 0:
+            raise RequiredFieldMissingError("Empty indentification attribute")
+
+        self.endpointdescription = URI(url)
         self.specification = specification
-        logging.debug(specification)
-        # Assuming English
-        # title
-        self.title = {"en": specification["info"]["title"]}
-        # description
-        if "description" in specification["info"]:
-            self.description = {"en": specification["info"]["description"]}
-        # contactPoint
-        if "contact" in specification["info"]:
-            contact = Contact()
-            if "name" in specification["info"]["contact"]:
-                contact.name = {"en": specification["info"]["contact"]["name"]}
-            if "email" in specification["info"]["contact"]:
-                contact.email = specification["info"]["contact"]["email"]
-            if "url" in specification["info"]["contact"]:
-                contact.url = specification["info"]["contact"]["url"]
-            self.contactpoint = contact
+        self.identifier = identifier
+        self.dataservices = []
+        self._media_types = []
+
         # endpointURL
         if "servers" in specification:
-            if "url" in specification["servers"][0]:
-                self.endpointURL = specification["servers"][0]["url"]
+            for server in specification["servers"]:
+                if "url" in server:
+                    self._create_dataservice(url=server["url"])
+        else:
+            self._create_dataservice()
+
+    @property
+    def identifier(self) -> str:
+        """Get/set for identifier."""
+        return self._identifier
+
+    @identifier.setter
+    def identifier(self, identifier: str) -> None:
+        self._identifier = identifier
+
+    # --
+    def _create_dataservice(self, url: Optional[str] = None) -> None:
+        self._dataservice = DataService()
+        # We may be given an identifier "template" ending with {uuid}.
+        # We create the uuid and complete the identifer:
+        self._dataservice.identifier = URI(
+            self.identifier.format(uuid=self._create_uuid())
+        )
+
+        if url:
+            self._dataservice.endpointURL = url
+        self._dataservice.endpointDescription = self.endpointdescription
+
+        self._parse_specification()
+        self.dataservices.append(self._dataservice)
+
+    def _parse_specification(self) -> None:
+        # title
+        self._parse_title()
+        # description
+        self._parse_description()
+        # contactpoint
+        self._parse_contacpoint()
         # license
         self._parse_license()
         # mediaType
@@ -88,18 +127,55 @@ class OASDataService(DataService):
         # externalDocs
         self._parse_external_docs()
 
+    def _parse_title(self) -> None:
+        """Parses the title object."""
+        if "title" in self.specification["info"]:
+            # Assuming English
+            # title
+            self._dataservice.title = {"en": self.specification["info"]["title"]}
+
+    def _parse_description(self) -> None:
+        """Parses the description object."""
+        if "description" in self.specification["info"]:
+            self._dataservice.description = {
+                "en": self.specification["info"]["description"]
+            }
+
+    def _parse_contacpoint(self) -> None:
+        """Parses the contact object."""
+        if "contact" in self.specification["info"]:
+            contact = Contact()
+            if "name" in self.specification["info"]["contact"]:
+                contact.name = {"en": self.specification["info"]["contact"]["name"]}
+            if "email" in self.specification["info"]["contact"]:
+                contact.email = self.specification["info"]["contact"]["email"]
+            if "url" in self.specification["info"]["contact"]:
+                contact.url = self.specification["info"]["contact"]["url"]
+            self._dataservice.contactpoint = contact
+
     def _parse_license(self) -> None:
         """Parses the license object."""
         if "license" in self.specification["info"]:
             if "url" in self.specification["info"]["license"]:
-                self.license = self.specification["info"]["license"]["url"]
+                self._dataservice.license = self.specification["info"]["license"]["url"]
 
     def _parse_media_type(self) -> None:
         """Parses the media type objects."""
-        self._media_types: List[str] = list()
         self._seek_media_types(self.specification, ["content"])
         # Need to remove duplicates:
-        self.media_types = list(set(self._media_types))
+        self._dataservice.media_types = list(set(self._media_types))
+
+    def _parse_external_docs(self) -> None:
+        """Parses the externalDocs objects."""
+        if "externalDocs" in self.specification:
+            if "url" in self.specification["externalDocs"]:
+                self._dataservice.landing_page.append(
+                    self.specification["externalDocs"]["url"]
+                )
+
+    # --
+    def _create_uuid(self) -> str:
+        return str(uuid.uuid4())
 
     def _seek_media_types(self, d: dict, key_list: List[str]) -> None:
         """Helper method.
@@ -115,16 +191,9 @@ class OASDataService(DataService):
         for k, v in d.items():
             if k in key_list:
                 for key in v.keys():
-                    logging.debug(k + ": " + str(key))
                     self._media_types.append(_url + str(key))
             if isinstance(v, dict):
                 self._seek_media_types(v, key_list)
-
-    def _parse_external_docs(self) -> None:
-        """Parses the externalDocs objects."""
-        if "externalDocs" in self.specification:
-            if "url" in self.specification["externalDocs"]:
-                self.landing_page.append(self.specification["externalDocs"]["url"])
 
 
 class Error(Exception):
@@ -147,6 +216,18 @@ class NotValidOASError(Error):
 
 class NotSupportedOASError(Error):
     """The specification object is not valid.
+
+    Attributes:
+        message -- explanation of the error
+    """
+
+    def __init__(self, message: str) -> None:
+        """Inits an object with default values."""
+        self.message = message
+
+
+class RequiredFieldMissingError(Error):
+    """A required filed is missing.
 
     Attributes:
         message -- explanation of the error

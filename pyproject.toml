@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oastodcat"
-version = "1.0.0"
+version = "2.0.0-alpha.1"
 description= "A library for to transform an openAPI file to a dcat:DataService"
 authors = ["Stig B. Dørmænen <stigbd@gmail.com>"]
 license = "Apache-2.0"
@@ -33,7 +33,7 @@ flake8-black = "^0.1.1"
 flake8-bugbear = "^20.1.4"
 flake8-import-order = "^0.18.1"
 safety = "^1.8.7"
-mypy = "^0.770"
+mypy = "^0.790"
 pytype = {version = "^2020.2.20", python = "3.7"}
 flake8-annotations = "^2.0.1"
 flake8-docstrings = "^1.5.0"
@@ -43,6 +43,8 @@ xdoctest = {extras = ["all"], version = "^0.11.0"}
 sphinx = "^2.4.4"
 sphinx-autodoc-typehints = "^1.10.3"
 codecov = "^2.0.16"
+pytest-mock = "^3.3.1"
+pep8-naming = "^0.11.1"
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
