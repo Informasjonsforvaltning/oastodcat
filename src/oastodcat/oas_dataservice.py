@@ -44,11 +44,11 @@ from datacatalogtordf import DataService, URI
 class OASDataService:
     """A simple class representing an openAPI specification.
 
-        Attributes:
-        specification (dict): an openAPI spec as a dict
-        dataservices (List[DataService]): a list of dataservices created
-        endpointdescription (str): The url of the openAPI specification
-        identifier (str): the identifier template, should contain {uuid}
+    Attributes:
+    specification (dict): an openAPI spec as a dict
+    dataservices (List[DataService]): a list of dataservices created
+    endpointdescription (str): The url of the openAPI specification
+    identifier (str): the identifier template, should contain {uuid}
     """
 
     __slots__ = (
@@ -70,10 +70,15 @@ class OASDataService:
     def __init__(self, url: str, specification: dict, identifier: str) -> None:
         """Inits an object with default values and parses the specification.
 
-        Parameters:
+        Args:
             url (str): the url of the openAPI specification
             specification (dict): an openAPI specification as a dict
-            identifier (str): the identifier template, should contain {uuid}
+            identifier (str): the identifier template, containing {uuid}
+
+        Raises:
+            NotSupportedOASError: We do not support this version of the specification
+            NotValidOASError: The specification is not valid
+            RequiredFieldMissingError: a required property is missing
         """
         super().__init__()
         if not (specification):
@@ -227,7 +232,7 @@ class NotValidOASError(Error):
 
 
 class NotSupportedOASError(Error):
-    """The specification object is not valid.
+    """We do not support this version of the specification.
 
     Attributes:
         message -- explanation of the error
