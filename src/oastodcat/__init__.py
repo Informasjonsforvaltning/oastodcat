@@ -16,3 +16,4 @@ except PackageNotFoundError:  # pragma: no cover
 from .oas_dataservice import NotSupportedOASError
 from .oas_dataservice import NotValidOASError
 from .oas_dataservice import OASDataService
+from .oas_dataservice import RequiredFieldMissingError
