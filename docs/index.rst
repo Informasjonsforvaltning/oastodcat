@@ -8,7 +8,8 @@ oastodcat library
    license
    reference
 
-A small Python library to transform an openAPI file to a dcat:DataService
+A small Python library to transform an openAPI file to one or more instances of dcat:DataService
+For each server object, an instance of DataService object will be created.
 
 
 Installation
@@ -29,23 +30,29 @@ This package can be used like this:
 
 .. code-block::
 
-  from datacatalogtordf import Catalog
-  from oastodcat import OASDataService
+import yaml
+import requests
+from datacatalogtordf import Catalog
+from oastodcat import OASDataService
 
-  # Create catalog object
-  catalog = Catalog()
-  catalog.identifier = "http://example.com/catalogs/1"
-  catalog.title = {"en": "A dataset catalog"}
-  catalog.publisher = "https://example.com/publishers/1"
+# Create catalog object
+catalog = Catalog()
+catalog.identifier = "http://example.com/catalogs/1"
+catalog.title = {"en": "A dataset catalog"}
+catalog.publisher = "https://example.com/publishers/1"
 
-  # Create a dataservice based on an openAPI-specification:
-  oas = json.load(<url_to_specification>)
-  dataservice = OASDataService(oas)
-  dataservice.identifier = "http://example.com/dataservices/1"
-  #
-  # Add dataservice to catalog:
+# Create a dataservice based on an openAPI-specification:
+url = ("https://raw.githubusercontent.com/"
+      "OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
+     )
+oas = yaml.safe_load(requests.get(url).text)
+identifier = "http://example.com/dataservices/{uuid}"
+oas_spec = OASDataService(url, oas, identifier)
+#
+# Add dataservices to catalog:
+for dataservice in oas_spec.dataservices:
   catalog.services.append(dataservice)
 
-  # get dcat representation in turtle (default)
-  dcat = catalog.to_rdf()
-  print(dcat.decode())
+# get dcat representation in turtle (default)
+dcat = catalog.to_rdf()
+print(dcat.decode())

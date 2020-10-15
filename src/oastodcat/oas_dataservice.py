@@ -21,13 +21,12 @@ Example:
     >>>        "OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
     >>>       )
     >>> oas = yaml.safe_load(requests.get(url).text)
-    >>> dataservices = OASDataService(oas)
-    >>> dataservices.identifier = "http://example.com/dataservices/{uuid}"
-    >>> dataservices.endpointDescription = url
+    >>> identifier = "http://example.com/dataservices/{uuid}"
+    >>> oas_spec = OASDataService(url, oas, identifier)
     >>> #
     >>> # Add dataservices to catalog:
-    >>> for dataservice in dataservices:
-    >>>     catalog.services.append(dataservice)
+    >>> for dataservice in oas_spec.dataservices:
+    >>>    catalog.services.append(dataservice)
     >>>
     >>> # get dcat representation in turtle (default)
     >>> dcat = catalog.to_rdf()
@@ -43,7 +42,14 @@ from datacatalogtordf import DataService, URI
 
 
 class OASDataService:
-    """A simple class representing an openAPI specification."""
+    """A simple class representing an openAPI specification.
+
+        Attributes:
+        specification (dict): an openAPI spec as a dict
+        dataservices (List[DataService]): a list of dataservices created
+        endpointdescription (str): The url of the openAPI specification
+        identifier (str): the identifier template, should contain {uuid}
+    """
 
     __slots__ = (
         "specification",
@@ -62,7 +68,13 @@ class OASDataService:
     _media_types: List[str]
 
     def __init__(self, url: str, specification: dict, identifier: str) -> None:
-        """Inits an object with default values and parses the specification."""
+        """Inits an object with default values and parses the specification.
+
+        Parameters:
+            url (str): the url of the openAPI specification
+            specification (dict): an openAPI specification as a dict
+            identifier (str): the identifier template, should contain {uuid}
+        """
         super().__init__()
         if not (specification):
             raise NotValidOASError("Empty specification object")
