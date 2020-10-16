@@ -44,27 +44,30 @@ from datacatalogtordf import DataService, URI
 class OASDataService:
     """A simple class representing an openAPI specification.
 
+    When initialized, the specification is parsed and one or more instances
+    of dcat:DataService is added to the list dataservices.
+
     Attributes:
-    specification (dict): an openAPI spec as a dict
-    dataservices (List[DataService]): a list of dataservices created
-    endpointdescription (str): The url of the openAPI specification
-    identifier (str): the identifier template, should contain {uuid}
+        specification (dict): an openAPI spec as a dict
+        dataservices (List[DataService]): a list of dataservices created
+        endpointdescription (str): The url of the openAPI specification
+        identifier (str): the identifier template, should contain {uuid}
     """
 
     __slots__ = (
-        "specification",
-        "dataservices",
+        "_specification",
+        "_dataservices",
         "_identifier",
-        "endpointdescription",
+        "_endpointdescription",
         "_media_types",
         "_dataservice",
     )
 
     # Types:
-    specification: dict
-    dataservices: List[DataService]
+    _specification: dict
+    _dataservices: List[DataService]
     _identifier: str
-    endpointdescription: URI
+    _endpointdescription: URI
     _media_types: List[str]
 
     def __init__(self, url: str, specification: dict, identifier: str) -> None:
@@ -91,10 +94,10 @@ class OASDataService:
         if len(identifier) == 0:
             raise RequiredFieldMissingError("Empty indentification attribute")
 
-        self.endpointdescription = URI(url)
+        self.endpointdescription = url
         self.specification = specification
         self.identifier = identifier
-        self.dataservices = []
+        self._dataservices: List[DataService] = []
         self._media_types = []
 
         # endpointURL
@@ -113,6 +116,29 @@ class OASDataService:
     @identifier.setter
     def identifier(self, identifier: str) -> None:
         self._identifier = identifier
+
+    @property
+    def endpointdescription(self) -> str:
+        """Get/set for endpointdescription."""
+        return self._endpointdescription
+
+    @endpointdescription.setter
+    def endpointdescription(self, endpointdescription: str) -> None:
+        self._endpointdescription = URI(endpointdescription)
+
+    @property
+    def specification(self) -> dict:
+        """Get/set for specification."""
+        return self._specification
+
+    @specification.setter
+    def specification(self, specification: dict) -> None:
+        self._specification = specification
+
+    @property
+    def dataservices(self) -> List[DataService]:
+        """Get for dataservices."""
+        return self._dataservices
 
     # --
     def _create_dataservice(self, url: Optional[str] = None) -> None:
