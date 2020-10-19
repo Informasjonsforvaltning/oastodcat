@@ -61,6 +61,8 @@ class OASDataService:
         "_endpointdescription",
         "_media_types",
         "_dataservice",
+        "_publisher",
+        "_conforms_to",
     )
 
     # Types:
@@ -69,6 +71,8 @@ class OASDataService:
     _identifier: str
     _endpointdescription: URI
     _media_types: List[str]
+    _publisher: str
+    _conforms_to: List[str]
 
     def __init__(self, url: str, specification: dict, identifier: str) -> None:
         """Inits an object with default values and parses the specification.
@@ -94,9 +98,9 @@ class OASDataService:
         if len(identifier) == 0:
             raise RequiredFieldMissingError("Empty indentification attribute")
 
+        self.identifier = identifier
         self.endpointdescription = url
         self.specification = specification
-        self.identifier = identifier
         self._dataservices: List[DataService] = []
         self._media_types = []
 
@@ -136,12 +140,35 @@ class OASDataService:
         self._specification = specification
 
     @property
+    def publisher(self) -> str:
+        """Get/set for publisher."""
+        return self._publisher
+
+    @publisher.setter
+    def publisher(self, publisher: str) -> None:
+        self._publisher = URI(publisher)
+        for dataservice in self._dataservices:
+            dataservice.publisher = publisher
+
+    @property
+    def conforms_to(self) -> List[str]:
+        """Get/set for conforms_to."""
+        return self._conforms_to
+
+    @conforms_to.setter
+    def conforms_to(self, conforms_to: List[str]) -> None:
+        self._conforms_to = conforms_to
+        for dataservice in self._dataservices:
+            dataservice.conformsTo = conforms_to
+
+    @property
     def dataservices(self) -> List[DataService]:
         """Get for dataservices."""
         return self._dataservices
 
     # --
     def _create_dataservice(self, url: Optional[str] = None) -> None:
+        """Creates a dataservice instance and appends it to list of dataservices."""
         self._dataservice = DataService()
         # We may be given an identifier "template" ending with {uuid}.
         # We create the uuid and complete the identifer:
@@ -153,10 +180,21 @@ class OASDataService:
             self._dataservice.endpointURL = url
         self._dataservice.endpointDescription = self.endpointdescription
 
+        try:
+            self._dataservice.publisher = self.publisher
+        except AttributeError:
+            pass
+
+        try:
+            self._dataservice.conformsTo = self.conforms_to
+        except AttributeError:
+            self.conforms_to: List[str] = []
+
         self._parse_specification()
         self.dataservices.append(self._dataservice)
 
     def _parse_specification(self) -> None:
+        """Parses the specification and adds the attribute to the dataservice."""
         # title
         self._parse_title()
         # description

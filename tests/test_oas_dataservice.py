@@ -518,6 +518,84 @@ def test_parse_spec_with_external_docs(spec_with_external_docs: str) -> None:
     assert _isomorphic
 
 
+def test_create_dataservice_with_publisher(minimal_spec: str) -> None:
+    """It returns a valid dataservice with dct:publisher."""
+    catalog = Catalog()
+    catalog.identifier = "http://example.com/catalogs/1"
+
+    url = "http://example.com/specifications/1"
+    oas = yaml.safe_load(minimal_spec)
+    identifier = "http://example.com/dataservices/1"
+    oas_spec = OASDataService(url, oas, identifier)
+    oas_spec.publisher = "http://example.com/publisher/1"
+    for dataservice in oas_spec.dataservices:
+        catalog.services.append(dataservice)
+
+    src = """
+        @prefix dct: <http://purl.org/dc/terms/> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix dcat: <http://www.w3.org/ns/dcat#> .
+
+        <http://example.com/catalogs/1> a dcat:Catalog ;
+            dcat:service <http://example.com/dataservices/1> .
+
+        <http://example.com/dataservices/1> a dcat:DataService ;
+            dct:title   "Swagger Petstore"@en ;
+            dcat:endpointDescription <http://example.com/specifications/1> ;
+            dct:publisher <http://example.com/publisher/1> ;
+        .
+        """
+
+    g1 = Graph().parse(data=catalog.to_rdf(), format="turtle")
+    g2 = Graph().parse(data=src, format="turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic
+
+
+def test_create_dataservice_with_conforms_to(minimal_spec: str) -> None:
+    """It returns a valid dataservice with dct:conformsTo."""
+    catalog = Catalog()
+    catalog.identifier = "http://example.com/catalogs/1"
+
+    url = "http://example.com/specifications/1"
+    oas = yaml.safe_load(minimal_spec)
+    identifier = "http://example.com/dataservices/1"
+    oas_spec = OASDataService(url, oas, identifier)
+    oas_spec.conforms_to = ["http://example.com/standards/1"]
+    for dataservice in oas_spec.dataservices:
+        catalog.services.append(dataservice)
+
+    src = """
+        @prefix dct: <http://purl.org/dc/terms/> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix dcat: <http://www.w3.org/ns/dcat#> .
+
+        <http://example.com/catalogs/1> a dcat:Catalog ;
+            dcat:service <http://example.com/dataservices/1> .
+
+        <http://example.com/dataservices/1> a dcat:DataService ;
+            dct:title   "Swagger Petstore"@en ;
+            dcat:endpointDescription <http://example.com/specifications/1> ;
+            dct:conformsTo <http://example.com/standards/1> ;
+        .
+        """
+
+    g1 = Graph().parse(data=catalog.to_rdf(), format="turtle")
+    g2 = Graph().parse(data=src, format="turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic
+
+
 # ---------------------------------------------------------------------- #
 # Utils for displaying debug information
 

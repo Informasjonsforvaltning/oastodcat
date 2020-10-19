@@ -53,7 +53,7 @@ The following table shows how an openAPI specification is mapped to a dcat:DataS
 | endpoint URL             | dcat:endpointURL         | servers.url          |
 | serves dataset           |                          | _n/a_                |
 | access rights            |                          |                      |
-| conforms to              |                          |                      |
+| conforms to              | dct:conformsTo           |                      |
 | contact point            | dcat:contactPoint        | info.contact         |
 | creator                  |                          |                      |
 | description              | dct:description          | info.description     |
@@ -67,7 +67,7 @@ The following table shows how an openAPI specification is mapped to a dcat:DataS
 | relation                 |                          |                      |
 | rights                   |                          |                      |
 | qualified relation       |                          |                      |
-| publisher                |                          |                      |
+| publisher                | dct:publisher            |                      |
 | release date             |                          |                      |
 | theme/category           |                          |                      |
 | title                    | dct:title                | info.title           |
