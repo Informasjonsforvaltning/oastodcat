@@ -28,6 +28,22 @@ def minimal_spec() -> str:
 
 
 @pytest.fixture(scope="session")
+def minimal_spec_with_multiline_descripton() -> str:
+    """Helper for creating a minimal specification object."""
+    _minimal_spec = """
+                    openapi: 3.0.3
+                    info:
+                      title: Swagger Petstore
+                      description: |
+                        Open API spesifikasjon av Konto APIene. (Under arbeid)
+                        * 0.7.5: Flyttet kontonummer til header
+                      version: 1.0.0
+                    paths: {}
+                    """
+    return _minimal_spec
+
+
+@pytest.fixture(scope="session")
 def spec_with_servers() -> str:
     """Helper for creating a minimal specification object."""
     _spec = """
@@ -197,6 +213,48 @@ def test_parse_minimal_spec(minimal_spec: str, mocker: MockFixture) -> None:
     assert _isomorphic
 
 
+def test_parse_minimal_spec_with_multiline_description(
+    minimal_spec_with_multiline_descripton: str, mocker: MockFixture
+) -> None:
+    """It returns a valid dataservice in a catalog."""
+    catalog = Catalog()
+    catalog.identifier = "http://example.com/catalogs/1"
+
+    url = "http://example.com/specifications/1"
+    oas = yaml.safe_load(minimal_spec_with_multiline_descripton)
+    identifier = "http://example.com/dataservices/1"
+    oas_spec = OASDataService(url, oas, identifier)
+    for dataservice in oas_spec.dataservices:
+        catalog.services.append(dataservice)
+
+    src = """
+        @prefix dct: <http://purl.org/dc/terms/> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix dcat: <http://www.w3.org/ns/dcat#> .
+
+        <http://example.com/catalogs/1> a dcat:Catalog ;
+            dcat:service <http://example.com/dataservices/1> .
+
+        <http://example.com/dataservices/1> a dcat:DataService ;
+            dct:title   "Swagger Petstore"@en ;
+            dct:description \"\"\"Open API spesifikasjon av Konto APIene. (Under arbeid)
+* 0.7.5: Flyttet kontonummer til header
+\"\"\"@en ;
+            dcat:endpointDescription <http://example.com/specifications/1> ;
+        .
+        """
+    g1 = Graph().parse(data=catalog.to_rdf(), format="turtle")
+    _dump_turtle(g1)
+    g2 = Graph().parse(data=src, format="turtle")
+
+    _isomorphic = isomorphic(g1, g2)
+    if not _isomorphic:
+        _dump_diff(g1, g2)
+        pass
+    assert _isomorphic
+
+
 def test_parse_spec_with_servers_url(spec_with_servers: str) -> None:
     """It returns a valid dataservice with endpoint URL."""
     catalog = Catalog()
@@ -233,13 +291,6 @@ def test_parse_spec_with_servers_url(spec_with_servers: str) -> None:
         _dump_diff(g1, g2)
         pass
     assert _isomorphic
-
-
-def _get_mock_uuid() -> int:
-    uuid = 0
-    uuid += 1
-    print("uuid", uuid)
-    return uuid
 
 
 def test_parse_spec_with_multiple_servers_url(
