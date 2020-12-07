@@ -300,10 +300,10 @@ def test_parse_spec_with_multiple_servers_url(
     catalog = Catalog()
     catalog.identifier = "http://example.com/catalogs/1"
     ids = [1, 2]
-    mocker.patch("oastodcat.OASDataService._create_uuid", side_effect=ids)
+    mocker.patch("oastodcat.oas_dataservice.create_id", side_effect=ids)
     url = "http://example.com/specifications/1"
     oas = yaml.safe_load(spec_with_multiple_servers)
-    identifier = "http://example.com/dataservices/{uuid}"
+    identifier = "http://example.com/dataservices/{id}"
     oas_spec = OASDataService(url, oas, identifier)
     for dataservice in oas_spec.dataservices:
         catalog.services.append(dataservice)

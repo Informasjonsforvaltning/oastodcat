@@ -46,7 +46,7 @@ This package can be used like this:
           "OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
          )
     oas = yaml.safe_load(requests.get(url).text)
-    identifier = "http://example.com/dataservices/{uuid}"
+    identifier = "http://example.com/dataservices/{id}"
     oas_spec = OASDataService(url, oas, identifier)
     #
     # Add dataservices to catalog:

@@ -21,7 +21,7 @@ Example:
     >>>        "OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
     >>>       )
     >>> oas = yaml.safe_load(requests.get(url).text)
-    >>> identifier = "http://example.com/dataservices/{uuid}"
+    >>> identifier = "http://example.com/dataservices/{id}"
     >>> oas_spec = OASDataService(url, oas, identifier)
     >>> #
     >>> # Add dataservices to catalog:
@@ -34,8 +34,8 @@ Example:
     >>> bool(dcat)
     True
 """
+import hashlib
 from typing import List, Optional
-import uuid
 
 from concepttordf import Contact
 from datacatalogtordf import DataService, URI
@@ -51,7 +51,7 @@ class OASDataService:
         specification (dict): an openAPI spec as a dict
         dataservices (List[DataService]): a list of dataservices created
         endpointdescription (str): The url of the openAPI specification
-        identifier (str): the identifier template, should contain {uuid}
+        identifier (str): the identifier template, should contain {id}
     """
 
     __slots__ = (
@@ -80,7 +80,7 @@ class OASDataService:
         Args:
             url (str): the url of the openAPI specification
             specification (dict): an openAPI specification as a dict
-            identifier (str): the identifier template, containing {uuid}
+            identifier (str): the identifier template, containing {id}
 
         Raises:
             NotSupportedOASError: We do not support this version of the specification
@@ -170,12 +170,6 @@ class OASDataService:
     def _create_dataservice(self, url: Optional[str] = None) -> None:
         """Creates a dataservice instance and appends it to list of dataservices."""
         self._dataservice = DataService()
-        # We may be given an identifier "template" ending with {uuid}.
-        # We create the uuid and complete the identifer:
-        self._dataservice.identifier = URI(
-            self.identifier.format(uuid=self._create_uuid())
-        )
-
         if url:
             self._dataservice.endpointURL = url
         self._dataservice.endpointDescription = self.endpointdescription
@@ -191,6 +185,16 @@ class OASDataService:
             self.conforms_to: List[str] = []
 
         self._parse_specification()
+
+        # We may be given an identifier "template" ending with {id}.
+        # We create the identifier and url based on title and complete the identifer:
+        id = (
+            self._dataservice.title["en"]
+            if url is None
+            else self._dataservice.title["en"] + url
+        )
+        self._dataservice.identifier = URI(self.identifier.format(id=create_id(id)))
+
         self.dataservices.append(self._dataservice)
 
     def _parse_specification(self) -> None:
@@ -200,7 +204,7 @@ class OASDataService:
         # description
         self._parse_description()
         # contactpoint
-        self._parse_contacpoint()
+        self._parse_contactpoint()
         # license
         self._parse_license()
         # mediaType
@@ -222,7 +226,7 @@ class OASDataService:
                 "en": self.specification["info"]["description"]
             }
 
-    def _parse_contacpoint(self) -> None:
+    def _parse_contactpoint(self) -> None:
         """Parses the contact object."""
         if "contact" in self.specification["info"]:
             contact = Contact()
@@ -255,9 +259,6 @@ class OASDataService:
                 )
 
     # --
-    def _create_uuid(self) -> str:
-        return str(uuid.uuid4())
-
     def _seek_media_types(self, d: dict, key_list: List[str]) -> None:
         """Helper method.
 
@@ -275,6 +276,11 @@ class OASDataService:
                     self._media_types.append(_url + str(key))
             if isinstance(v, dict):
                 self._seek_media_types(v, key_list)
+
+
+def create_id(s: str) -> str:
+    """Helper function to create unique ids based on input str s."""
+    return hashlib.sha1(str.encode(s)).hexdigest()  # noqa: S303
 
 
 class Error(Exception):
