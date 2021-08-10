@@ -30,7 +30,7 @@ Example:
     >>>
     >>> # get dcat representation in turtle (default)
     >>> dcat = catalog.to_rdf()
-    >>> print(dcat.decode())
+    >>> print(dcat)
     >>> bool(dcat)
     True
 """
