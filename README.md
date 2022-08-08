@@ -51,7 +51,7 @@ The following table shows how an openAPI specification is mapped to a dcat:DataS
 (Only dcat:DataService properties are shown.)
 
 | dcat:DataService         | RDF property             | openAPI v 3.0.x      | Note |
-| ------------------------ | ------------------------ | -------------------- | ---- |
+|--------------------------|--------------------------|----------------------|------|
 | endpoint description     | dcat:endpointDescription | <url to description> |      |
 | endpoint URL             | dcat:endpointURL         | servers.url          | [1]  |
 | serves dataset           |                          | _n/a_                |      |

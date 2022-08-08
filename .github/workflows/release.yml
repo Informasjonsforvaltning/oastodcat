@@ -4,16 +4,10 @@ on:
     types: [published]
 jobs:
   release:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
-      with:
-        python-version: '3.9'
-        architecture: x64
-    - run: pip install nox==2021.6.12
-    - run: pip install poetry==1.1.7
-    - run: pip install nox-poetry==0.8.6
-    - run: nox
-    - run: poetry build
-    - run: poetry publish --username=__token__ --password=${{secrets.PYPI_TOKEN}}
+    uses: Informasjonsforvaltning/workflows/.github/workflows/release-poetry.yaml@main
+    with:
+      python_version: '3.9'
+      python_architecture: x64
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
