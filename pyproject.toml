@@ -1,49 +1,50 @@
 [tool.poetry]
-name = "oastodcat"
-version = "2.0.0"
-description= "A library for transforming an openAPI file to one or more dcat:DataService"
 authors = ["Stig B. Dørmænen <stigbd@gmail.com>"]
-license = "Apache-2.0"
-readme = "README.md"
-homepage = "https://github.com/Informasjonsforvaltning/oastodcat"
-repository = "https://github.com/Informasjonsforvaltning/oastodcat"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+description = "A library for transforming an openAPI file to one or more dcat:DataService"
 documentation = "https://oastodcat.readthedocs.io"
-classifiers=[
-      "Programming Language :: Python :: 3",
-      "License :: OSI Approved :: Apache Software License",
-      "Operating System :: OS Independent",
-      ]
+homepage = "https://github.com/Informasjonsforvaltning/oastodcat"
+license = "Apache-2.0"
+name = "oastodcat"
+readme = "README.md"
+repository = "https://github.com/Informasjonsforvaltning/oastodcat"
+version = "2.0.1"
+
 [tool.poetry.dependencies]
-python = "^3.7"
-requests = "^2.24.0"
+datacatalogtordf = "^2.1.2"
+python = ">=3.8,<3.11"
 pyyaml = "^5.3.1"
-importlib_metadata = {version = "^1.5.0", python = "<3.8"}
-datacatalogtordf = "^1.0.0"
-rdflib = "^6.0.0"
+requests = "^2.24.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.1.1"
-coverage = {extras = ["toml"], version = "^5.0.3"}
-pytest-cov = "^2.8.1"
-flake8 = "^3.7.9"
-flake8-bandit = "^2.1.2"
-flake8-black = "^0.2.1"
-flake8-import-order = "^0.18.1"
-safety = "^1.8.7"
-pytype = {version = "^2020.2.20", python = "3.7"}
-flake8-annotations = "^2.0.1"
-flake8-docstrings = "^1.5.0"
-darglint = "^1.2.0"
-Pygments = "^2.6.1"
-xdoctest = "^0.15.0"
+Sphinx = "^5.0.1"
+bandit = "^1.7.4"
+black = "^22.6.0"
 codecov = "^2.0.16"
+coverage = "^6.4.3"
+darglint = "^1.2.0"
+flake8 = "^4.0.1"
+flake8-annotations = "^2.4.1"
+flake8-bandit = "^3.0.0"
+flake8-black = "^0.3.3"
+flake8-bugbear = "^22.4.25"
+flake8-docstrings = "^1.5.0"
+flake8-import-order = "^0.18.1"
+mypy = "^0.971"
+nox = "^2022.8.7"
+nox-poetry = "^1.0.1"
+pep8-naming = "^0.13.1"
+pytest = "^7.1.2"
+pytest-cov = "^3.0.0"
 pytest-mock = "^3.3.1"
+pytype = "^2022.5.19"
+safety = "^2.1.1"
 sphinx-autodoc-typehints = "^1.11.1"
-black = "^21.7b0"
-mypy = "^0.910"
-Sphinx = "^4.1.2"
-pep8-naming = "^0.12.1"
-flake8-bugbear = "^21.4.3"
+xdoctest = "^1.0.1"
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
@@ -53,9 +54,9 @@ branch = false
 source = ["oastodcat"]
 
 [tool.coverage.report]
-show_missing = true
 fail_under = 100
+show_missing = true
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]

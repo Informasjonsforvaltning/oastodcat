@@ -280,7 +280,9 @@ class OASDataService:
 
 def create_id(s: str) -> str:
     """Helper function to create unique ids based on input str s."""
-    return hashlib.sha1(str.encode(s)).hexdigest()  # noqa: S303
+    return hashlib.new(  # type: ignore  # noqa: S324
+        "sha1", str.encode(s), usedforsecurity=False
+    ).hexdigest()
 
 
 class Error(Exception):
