@@ -1,20 +1,11 @@
 name: Tests
 on: push
 jobs:
-  test_3-7:
-    name: Python 3.7
-    uses: Informasjonsforvaltning/workflows/.github/workflows/test-nox.yaml@main
-    with:
-      python_version: '3.7'
-      python_architecture: x64
-    secrets:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   test_3-8:
     name: Python 3.8
     uses: Informasjonsforvaltning/workflows/.github/workflows/test-nox.yaml@main
     with:
-      python_version: '3.8'
+      python_version: "3.8"
       python_architecture: x64
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -23,7 +14,15 @@ jobs:
     name: Python 3.9
     uses: Informasjonsforvaltning/workflows/.github/workflows/test-nox.yaml@main
     with:
-      python_version: '3.9'
+      python_version: "3.9"
+      python_architecture: x64
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  test_3-10:
+    name: Python 3.10
+    uses: Informasjonsforvaltning/workflows/.github/workflows/test-nox.yaml@main
+    with:
+      python_version: "3.10"
       python_architecture: x64
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
