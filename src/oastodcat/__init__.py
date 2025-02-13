@@ -3,10 +3,7 @@
 Modules:
     oas_dataservice
 """
-try:
-    from importlib.metadata import version, PackageNotFoundError  # type: ignore
-except ImportError:  # pragma: no cover
-    from importlib_metadata import version, PackageNotFoundError  # type: ignore
+from importlib.metadata import version, PackageNotFoundError  # type: ignore
 
 try:
     __version__ = version(__name__)
@@ -18,3 +15,6 @@ from .oas_dataservice import NotSupportedOASError
 from .oas_dataservice import NotValidOASError
 from .oas_dataservice import OASDataService
 from .oas_dataservice import RequiredFieldMissingError
+
+__all__ = ["create_id", "NotSupportedOASError", "NotValidOASError", "OASDataService", "RequiredFieldMissingError"
+]

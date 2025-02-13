@@ -17,10 +17,12 @@ Example:
     >>> catalog.publisher = "https://example.com/publishers/1"
     >>>
     >>> # Create a dataservice based on an openAPI-specification:
-    >>> url = ("https://raw.githubusercontent.com/"
-    >>>        "OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml"
-    >>>       )
-    >>> oas = yaml.safe_load(requests.get(url).text)
+    >>> url = "tests/files/openapi.yaml"
+    >>> with open(url) as stream:
+    >>>     try:
+    >>>        oas = yaml.safe_load(stream)
+    >>>     except yaml.YAMLError as exc:
+    >>>        raise exc
     >>> identifier = "http://example.com/dataservices/{id}"
     >>> oas_spec = OASDataService(url, oas, identifier)
     >>> #
@@ -37,8 +39,7 @@ Example:
 import hashlib
 from typing import List, Optional
 
-from concepttordf import Contact
-from datacatalogtordf import DataService, URI
+from datacatalogtordf import Contact, DataService, URI
 
 
 class OASDataService:
@@ -47,11 +48,6 @@ class OASDataService:
     When initialized, the specification is parsed and one or more instances
     of dcat:DataService is added to the list dataservices.
 
-    Attributes:
-        specification (dict): an openAPI spec as a dict
-        dataservices (List[DataService]): a list of dataservices created
-        endpointdescription (str): The url of the openAPI specification
-        identifier (str): the identifier template, should contain {id}
     """
 
     __slots__ = (
@@ -159,7 +155,7 @@ class OASDataService:
     def conforms_to(self, conforms_to: List[str]) -> None:
         self._conforms_to = conforms_to
         for dataservice in self._dataservices:
-            dataservice.conformsTo = conforms_to
+            dataservice.conforms_to = conforms_to
 
     @property
     def dataservices(self) -> List[DataService]:
@@ -180,9 +176,9 @@ class OASDataService:
             pass
 
         try:
-            self._dataservice.conformsTo = self.conforms_to
+            self._dataservice.conforms_to = self.conforms_to
         except AttributeError:
-            self.conforms_to: List[str] = []
+            self._conforms_to: List[str] = []
 
         self._parse_specification()
 

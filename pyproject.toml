@@ -1,50 +1,38 @@
-[tool.poetry]
-authors = ["Stig B. Dørmænen <stigbd@gmail.com>"]
-classifiers = [
-  "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: Apache Software License",
-  "Operating System :: OS Independent",
-]
-description = "A library for transforming an openAPI file to one or more dcat:DataService"
-documentation = "https://oastodcat.readthedocs.io"
-homepage = "https://github.com/Informasjonsforvaltning/oastodcat"
-license = "Apache-2.0"
+[project]
 name = "oastodcat"
+version = "2.0.3"
+description = "A library for transforming an openAPI file to one or more dcat:DataService"
+authors = [{ name = "Stig B. Dørmænen", email = "stigbd@gmail.com" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
 readme = "README.md"
-repository = "https://github.com/Informasjonsforvaltning/oastodcat"
-version = "2.0.2"
+license = "Apache-2.0"
+requires-python = ">=3.8,<3.14"
+dependencies = ["datacatalogtordf>=3.0.0"]
 
-[tool.poetry.dependencies]
-PyYAML = "^6.0"
-datacatalogtordf = "^2.1.2"
-python = ">=3.8,<3.11"
-requests = "^2.24.0"
+[project.urls]
+Homepage = "https://github.com/Informasjonsforvaltning/oastodcat"
+Documentation = "https://oastodcat.readthedocs.io"
+Repository = "https://github.com/Informasjonsforvaltning/oastodcat"
+Issues = "https://github.com/Informasjonsforvaltning/oastodcat/issues"
 
-[tool.poetry.dev-dependencies]
-Sphinx = "^5.0.1"
-bandit = "^1.7.4"
-black = "^22.6.0"
-codecov = "^2.0.16"
-coverage = "^6.4.3"
-darglint = "^1.2.0"
-flake8 = "^4.0.1"
-flake8-annotations = "^2.4.1"
-flake8-bandit = "^3.0.0"
-flake8-black = "^0.3.3"
-flake8-bugbear = "^22.4.25"
-flake8-docstrings = "^1.5.0"
-flake8-import-order = "^0.18.1"
-mypy = "^0.971"
-nox = "^2022.8.7"
-nox-poetry = "^1.0.1"
-pep8-naming = "^0.13.1"
-pytest = "^7.1.2"
-pytest-cov = "^3.0.0"
-pytest-mock = "^3.3.1"
-pytype = "^2022.5.19"
-safety = "^2.1.1"
-sphinx-autodoc-typehints = "^1.11.1"
-xdoctest = "^1.0.1"
+[dependency-groups]
+dev = [
+    "deptry>=0.20.0",
+    "pip-audit>=2.7.3",
+    "poethepoet>=0.30.0",
+    "pyright>=1.1.393",
+    "pytest>=8.3.4",
+    "pytest-cov>=5.0.0",
+    "pytest-mock>=3.14.0",
+    "ruff>=0.9.4",
+    "sphinx>=7.1.2",
+    "sphinx-autodoc-typehints>=2.0.1",
+    "xdoctest>=1.2.0",
+]
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
@@ -58,5 +46,23 @@ fail_under = 100
 show_missing = true
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=1.0.0"]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.poe.tasks]
+format = "uv run ruff format"
+lint = "uv run ruff check --fix"
+pyright = "uv run pyright"
+check-deps = "uv run deptry ."
+audit = "uv run pip-audit"
+test = [
+    { cmd = "uv run --python 3.8 pytest -s --cov --cov-report=term-missing --cov-report=html" },
+    { cmd = "uv run --python 3.9 pytest -s --cov --cov-report=term-missing --cov-report=html" },
+    { cmd = "uv run --python 3.10 pytest -s --cov --cov-report=term-missing --cov-report=html" },
+    { cmd = "uv run --python 3.11 pytest -s --cov --cov-report=term-missing --cov-report=html" },
+    { cmd = "uv run --python 3.12 pytest -s --cov --cov-report=term-missing --cov-report=html" },
+    { cmd = "uv run --python 3.13 pytest -s --cov --cov-report=term-missing --cov-report=html" },
+]
+xdoctest = "uv run xdoctest oastodcat"
+build_docs = "uv run sphinx-build docs docs/_build"
+release = ["lint", "pyright", "check-deps", "audit", "test", "xdoctest"]

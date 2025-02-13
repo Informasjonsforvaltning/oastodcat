@@ -9,6 +9,6 @@ Reference
 oastodcat.oas_dataservice
 -------------------------
 
-.. automodule:: oastodcat.OASDataService
+.. automodule:: oastodcat.oas_dataservice
   :members:
   :show-inheritance:

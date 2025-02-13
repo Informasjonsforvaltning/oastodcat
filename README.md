@@ -54,7 +54,7 @@ print(dcat)
 
 ## Mapping
 
-The following table shows how an openAPI specification is mapped to a dcat:DataService:  
+The following table shows how an openAPI specification is mapped to a dcat:DataService:
 (Only dcat:DataService properties are shown.)
 
 | dcat:DataService         | RDF property             | openAPI v 3.0.x      | Note |
@@ -92,18 +92,14 @@ The following table shows how an openAPI specification is mapped to a dcat:DataS
 
 ### Requirements
 
-- python3
-- [pyenv](https://github.com/pyenv/pyenv) (recommended)
-- [pipx](https://github.com/pipxproject/pipx) (recommended)
-- [poetry](https://python-poetry.org/)
-- [nox](https://nox.thea.codes/en/stable/)
-- [nox-poetry](https://pypi.org/project/nox-poetry/)
+You need [uv](https://docs.astral.sh/uv/) to manage dependencies and run the application.
 
-```Shell
-% pipx install poetry==1.0.5
-% pipx install nox==2019.11.9
-% pipx inject nox nox-poetry
+Install it with:
+
+```shell
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+or follow the instructions on the [uv website](https://docs.astral.sh/uv/getting-started/installation/).
 
 ### Install dependencies
 
@@ -112,30 +108,27 @@ The following table shows how an openAPI specification is mapped to a dcat:DataS
 ```Shell
 % git clone https://github.com/Informasjonsforvaltning/oastodcat.git
 % cd oastodcat
-% pyenv install 3.8.6
-% pyenv install 3.9.0
-% pyenv install 3.10.4
-% poetry install
+% uv sync
 ```
 
 ### Run all sessions
 
 ```Shell
-% nox
+% uv run poe release
 ```
 
 ### Run all tests with coverage reporting
 
 ```Shell
-% nox -rs tests
+% uv run poe test
 ```
 
 ### Debugging
 
-You can enter into [Pdb](https://docs.python.org/3/library/pdb.html) by passing `--pdb` to pytest:
+You can set breakpoints directly in code by using the function `breakpoint()`.
+
+Run the tests with the `--pdb` flag to enter the debugger when a test fails:
 
 ```Shell
-nox -rs tests -- --pdb
+% uv run --python 3.13 pytest --capture=no --pdb
 ```
-
-You can set breakpoints directly in code by using the function `breakpoint()`.
