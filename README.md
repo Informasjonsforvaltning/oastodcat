@@ -1,5 +1,10 @@
 # oastodcat
 
+> ⚠️ This repository is archived
+> 
+> This codebase is no longer in use and is not under active development.
+> If you are interested in reviving or contributing to this project, please contact us at fellesdatakatalog@digdir.no.
+
 ![Tests](https://github.com/Informasjonsforvaltning/oastodcat/workflows/Tests/badge.svg)
 [![codecov](https://codecov.io/gh/Informasjonsforvaltning/oastodcat/branch/master/graph/badge.svg)](https://codecov.io/gh/Informasjonsforvaltning/oastodcat)
 [![PyPI](https://img.shields.io/pypi/v/oastodcat.svg)](https://pypi.org/project/oastodcat/)
